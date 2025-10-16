@@ -1,0 +1,35 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-syrensensor-dev-aff96-authRole",
+      "UnauthRoleArn": "arn:aws:iam::149597917066:role/amplify-syrensensor-dev-aff96-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::149597917066:role/amplify-syrensensor-dev-aff96-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-syrensensor-dev-aff96-deployment",
+      "UnauthRoleName": "amplify-syrensensor-dev-aff96-unauthRole",
+      "StackName": "amplify-syrensensor-dev-aff96",
+      "StackId": "arn:aws:cloudformation:us-east-1:149597917066:stack/amplify-syrensensor-dev-aff96/9e243770-a08a-11f0-a793-0ea10d718191",
+      "AmplifyAppId": "d1p40f7k6xi83b",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-syrensensor-dev-aff96-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    },
+    "categories": {
+      "hosting": {
+        "amplifyhosting": {
+          "appId": "d1p40f7k6xi83b",
+          "type": "manual"
+        }
+      },
+      "auth": {
+        "syrensensor6dc1427f": {},
+        "userPoolGroups": {}
+      },
+      "function": {
+        "syrensensor6dc1427fPostConfirmation": {
+          "GROUP": "SyrenSensorUsers",
+          "deploymentBucketName": "amplify-syrensensor-dev-aff96-deployment",
+          "s3Key": "amplify-builds/syrensensor6dc1427fPostConfirmation-31423339616e754c4675-build.zip"
+        }
+      }
+    }
+  }
+}
