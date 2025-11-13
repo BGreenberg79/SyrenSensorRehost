@@ -27,7 +27,7 @@
         "syrensensor6dc1427fPostConfirmation": {
           "GROUP": "SyrenSensorUsers",
           "deploymentBucketName": "amplify-syrensensor-dev-aff96-deployment",
-          "s3Key": "amplify-builds/syrensensor6dc1427fPostConfirmation-31423339616e754c4675-build.zip"
+          "s3Key": "amplify-builds/syrensensor6dc1427fPostConfirmation-6a3547345662664d324c-build.zip"
         }
       }
     }

@@ -99,7 +99,7 @@ function App() {
           return;
         }
 
-        const res = await fetch(`https://lesiun05ul.execute-api.us-east-1.amazonaws.com/demo/get-profile?userID=${encodeURIComponent(userID)}`, {
+        const res = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles?userID=${encodeURIComponent(userID)}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -157,14 +157,14 @@ function App() {
 
     try {
       // Get name + dob from UserSignUp
-      const signupRes = await fetch(`https://lesiun05ul.execute-api.us-east-1.amazonaws.com/demo/SignUp?userID=${encodeURIComponent(loginId)}`, {
+      const signupRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/devprofiles?userID=${encodeURIComponent(loginId)}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${idToken}` },
       });
       const signupData = await signupRes.json();
     
       // Get height + weight from emergencyContacts
-      const contactRes = await fetch(`https://lesiun05ul.execute-api.us-east-1.amazonaws.com/demo/get-profile?userID=${encodeURIComponent(loginId)}`, {
+      const contactRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles?userID=${encodeURIComponent(loginId)}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${idToken}` },
       });

@@ -34,7 +34,7 @@ export default function CompleteRegistration() {
     try {
       const idToken = (await fetchAuthSession()).tokens?.idToken?.toString(); 
 
-      const res = await fetch("https://lesiun05ul.execute-api.us-east-1.amazonaws.com/demo/additional-info", {
+      const res = await fetch("https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
