@@ -20,59 +20,94 @@ Amplify.configure(outputs);
 const formFields = {
 	signUp: {
 		// Basic Information
-		name: {
+		firstName: {
 			order: 1,
-			label: "Full Name",
+			label: "First Name",
+			placeholder: "Enter your full name",
+			isRequired: true,
+		},
+		lastName: {
+			order: 2,
+			label: "Last Name",
 			placeholder: "Enter your full name",
 			isRequired: true,
 		},
 		email: {
-			order: 2,
+			order: 3,
 			label: "Email",
 			placeholder: "Enter your email",
 			isRequired: true,
 		},
 		phone_number: {
-			order: 3,
+			order: 4,
 			label: "Phone Number",
 			placeholder: "Enter your phone number",
 			isRequired: true,
 		},
 		// Personal Details
 		birthdate: {
-			order: 4,
+			order: 5,
 			label: "Date of Birth",
 			placeholder: "YYYY-MM-DD",
 			type: "date",
 			isRequired: true,
 		},
 		gender: {
-			order: 5,
+			order: 6,
 			label: "Gender",
 			placeholder: "Enter your gender identity",
 			type: "text",
 		},
 		address: {
-			order: 6,
-			label: "Address",
-			placeholder: "Enter your address",
-			type: "textarea",
+		order: 7,
+		label: "Street Address",
+		placeholder: "Enter your street address",
+		isRequired: false,
 		},
-		// Security
+		apartmentNumber: {
+		order: 8,
+		label: "Apartment/Unit Number",
+		placeholder: "Enter apartment or unit number",
+		isRequired: false,
+		},
+		city: {
+		order: 9,
+		label: "City",
+		placeholder: "Enter your city",
+		isRequired: false,
+		},
+		state: {
+		order: 10,
+		label: "State",
+		placeholder: "Enter your state",
+		isRequired: false,
+		},
+		zipCode: {
+		order: 11,
+		label: "Zip Code",
+		placeholder: "Enter your zip code",
+		isRequired: false,
+		},
+		country: {
+		order: 12,
+		label: "Country",
+		placeholder: "Enter your country",
+		isRequired: false,
+		},
 		password: {
-			order: 7,
-			label: "Password",
-			placeholder: "Create a strong password",
-			isRequired: true,
-			type: "password",
+		order: 13,
+		label: "Password",
+		placeholder: "Create a strong password",
+		isRequired: true,
+		type: "password",
 		},
 		confirm_password: {
-			order: 8,
-			label: "Confirm Password",
-			placeholder: "Confirm your password",
-			isRequired: true,
-			type: "password",
-		},
+		order: 14,
+		label: "Confirm Password",
+		placeholder: "Confirm your password",
+		isRequired: true,
+		type: "password",
+		}
 	},
 };
 const LogoHeader = () => (
