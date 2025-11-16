@@ -111,19 +111,35 @@ export default function Settings() {
           <fieldset>
             <legend className="text-white text-xl font-bold mb-2">User Info</legend>
             <div className='space-y-2'>
-              <div>
-                <label htmlFor='name' className="sr-only">Full Name</label>
-                <input
-                  id='name'
-                  type="text"
-                  aria-label='Full Name'
-                  className="w-full p-3 bg-gray-200 text-blue-700 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-emerald-600 placeholder:opacity-90"
-                  placeholder="Full Name"
-                  value={settingsState.user.name}
-                  onChange={(e) =>
-                    updateUser({ ...settingsState.user, name: e.target.value })
-                  }
-                />
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor='firstName' className="sr-only">First Name</label>
+                  <input
+                    id='firstName'
+                    type="text"
+                    aria-label='First Name'
+                    className="w-full p-3 bg-gray-200 text-blue-700 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-emerald-600 placeholder:opacity-90"
+                    placeholder="First Name"
+                    value={settingsState.user.firstName}
+                    onChange={(e) =>
+                      updateUser({ ...settingsState.user, firstName: e.target.value })
+                    }
+                  />
+                </div>
+                <div>
+                  <label htmlFor='lastName' className="sr-only">Last Name</label>
+                  <input
+                    id='lastName'
+                    type="text"
+                    aria-label='Last Name'
+                    className="w-full p-3 bg-gray-200 text-blue-700 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-emerald-600 placeholder:opacity-90"
+                    placeholder="Last Name"
+                    value={settingsState.user.lastName}
+                    onChange={(e) =>
+                      updateUser({ ...settingsState.user, lastName: e.target.value })
+                    }
+                  />
+                </div>
               </div>
               <div>
                 <label htmlFor='age' className="sr-only">Age</label>

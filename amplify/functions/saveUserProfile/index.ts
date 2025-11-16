@@ -34,8 +34,10 @@ export const handler = async (
     const body = JSON.parse(event.body ?? "{}");
     const {
       email,
-      firstName,
-      lastName,
+      patientFirstName,
+      patientLastName,
+      firstName: contactFirstName,
+      lastName: contactLastName,
       phoneNumber,
       relationship,
       height,
@@ -71,13 +73,20 @@ export const handler = async (
       })
     );
 
+    const normalizedFullName = (name ?? "").trim();
+    const [fallbackFirstName = "", ...restOfName] = normalizedFullName
+      .split(/\s+/)
+      .filter(Boolean);
+    const fallbackLastName = restOfName.join(" ");
+
     await docClient.send(
       new PutCommand({
         TableName: USER_PROFILES_TABLE_NAME,
         Item: {
           userId,
           email,
-          name: name ?? "",
+          firstName: patientFirstName ?? fallbackFirstName,
+          lastName: patientLastName ?? fallbackLastName,
           age: age ? Number.parseInt(age, 10) : 0,
           gender: "",
           height: height ?? "",
@@ -96,8 +105,8 @@ export const handler = async (
         Item: {
           contactId,
           userId,
-          firstName: firstName ?? "",
-          lastName: lastName ?? "",
+          firstName: contactFirstName ?? "",
+          lastName: contactLastName ?? "",
           phoneNumber: phoneNumber ?? "",
           relationship: relationship ?? "",
           createdAt: now,

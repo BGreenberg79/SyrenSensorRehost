@@ -34,7 +34,8 @@ interface SettingsContextType {
 const defaultState: SettingsState = {
   user: {
     userId: 0,
-    name: "",
+    firstName: "",
+    lastName: "",
     age: 0,
     gender: null,
     height: "",

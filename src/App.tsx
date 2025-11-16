@@ -186,13 +186,21 @@ function App() {
       const signupItem = signupData;
       console.log("signupItem:", signupItem);
       const age = calculateAge(signupItem?.DOB);
+       const normalizedPatientName = (signupItem?.name ?? "").trim();
+      const [fallbackFirstName = "", ...remainingNameParts] = normalizedPatientName
+        .split(/\s+/)
+        .filter(Boolean);
+      const fallbackLastName = remainingNameParts.join(" ");
+      const profileFirstName = signupItem?.firstName ?? fallbackFirstName ?? "—";
+      const profileLastName = signupItem?.lastName ?? fallbackLastName ?? "—";
 
       // Push to SettingsContext
     setSettingsState((prev) => ({
       ...prev,
       user: {
         ...prev.user,
-        name: signupItem?.name || "—",
+        firstName: profileFirstName,
+        lastName: profileLastName,
         age: age || 0,
         gender: signupItem?.gender || "—",
         height: contactData?.height || "—",
@@ -212,7 +220,7 @@ function App() {
 
       },
     }));
-    console.log("setSettingsState called with name:", signupItem.name);
+  console.log("setSettingsState called with patient name:", profileFirstName, profileLastName);
 
 
     } catch (err) {
