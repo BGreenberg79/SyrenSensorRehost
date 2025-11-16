@@ -12,9 +12,6 @@ import { SettingsProvider } from "./context/SettingsContext.tsx";
 import syrenLogo from './assets/syrensensor2.png'
 import { useAuthenticator } from "@aws-amplify/ui-react";
 
-
-
-
 Amplify.configure(outputs);
 
 const formFields = {
@@ -23,13 +20,13 @@ const formFields = {
 		firstName: {
 			order: 1,
 			label: "First Name",
-			placeholder: "Enter your full name",
+			placeholder: "Enter your first name",
 			isRequired: true,
 		},
 		lastName: {
 			order: 2,
 			label: "Last Name",
-			placeholder: "Enter your full name",
+			placeholder: "Enter your last name",
 			isRequired: true,
 		},
 		email: {
@@ -44,72 +41,105 @@ const formFields = {
 			placeholder: "Enter your phone number",
 			isRequired: true,
 		},
-		// Personal Details
-		birthdate: {
+		// Health Information
+		address: {
 			order: 5,
-			label: "Date of Birth",
-			placeholder: "YYYY-MM-DD",
-			type: "date",
+			label: "Height (inches)",
+			placeholder: "e.g., 70",
+			isRequired: true,
+		},
+		birthdate: {
+			order: 6,
+			label: "Weight (lbs)",
+			placeholder: "e.g., 180",
 			isRequired: true,
 		},
 		gender: {
-			order: 6,
+			order: 7,
 			label: "Gender",
 			placeholder: "Enter your gender identity",
 			type: "text",
 		},
-		address: {
-		order: 7,
-		label: "Street Address",
-		placeholder: "Enter your street address",
-		isRequired: false,
+		// Emergency Contact
+		family_name: {
+			order: 8,
+			label: "Emergency Contact First Name",
+			placeholder: "Enter emergency contact first name",
+			isRequired: true,
 		},
-		apartmentNumber: {
-		order: 8,
-		label: "Apartment/Unit Number",
-		placeholder: "Enter apartment or unit number",
-		isRequired: false,
+		given_name: {
+			order: 9,
+			label: "Emergency Contact Last Name",
+			placeholder: "Enter emergency contact last name",
+			isRequired: true,
 		},
-		city: {
-		order: 9,
-		label: "City",
-		placeholder: "Enter your city",
-		isRequired: false,
+		middle_name: {
+			order: 10,
+			label: "Emergency Contact Phone",
+			placeholder: "Enter emergency contact phone",
+			isRequired: true,
 		},
-		state: {
-		order: 10,
-		label: "State",
-		placeholder: "Enter your state",
-		isRequired: false,
+		nickname: {
+			order: 11,
+			label: "Relationship to Emergency Contact",
+			placeholder: "e.g., Sister, Brother, Parent",
+			isRequired: true,
 		},
-		zipCode: {
-		order: 11,
-		label: "Zip Code",
-		placeholder: "Enter your zip code",
-		isRequired: false,
+		// Address
+		street_address: {
+			order: 12,
+			label: "Street Address",
+			placeholder: "Enter your street address",
+			isRequired: false,
+		},
+		apartment_number: {
+			order: 13,
+			label: "Apartment/Unit Number (optional)",
+			placeholder: "Apt, Suite, Unit number",
+			isRequired: false,
+		},
+		locality: {
+			order: 14,
+			label: "City",
+			placeholder: "Enter your city",
+			isRequired: false,
+		},
+		region: {
+			order: 15,
+			label: "State",
+			placeholder: "Enter your state",
+			isRequired: false,
+		},
+		postal_code: {
+			order: 16,
+			label: "Zip Code",
+			placeholder: "Enter your zip code",
+			isRequired: false,
 		},
 		country: {
-		order: 12,
-		label: "Country",
-		placeholder: "Enter your country",
-		isRequired: false,
+			order: 17,
+			label: "Country",
+			placeholder: "Enter your country",
+			isRequired: false,
 		},
+		// Security
 		password: {
-		order: 13,
-		label: "Password",
-		placeholder: "Create a strong password",
-		isRequired: true,
-		type: "password",
+			order: 18,
+			label: "Password",
+			placeholder: "Create a strong password",
+			isRequired: true,
+			type: "password",
 		},
 		confirm_password: {
-		order: 14,
-		label: "Confirm Password",
-		placeholder: "Confirm your password",
-		isRequired: true,
-		type: "password",
-		}
+			order: 19,
+			label: "Confirm Password",
+			placeholder: "Confirm your password",
+			isRequired: true,
+			type: "password",
+		},
 	},
 };
+
 const LogoHeader = () => (
   <div className="flex justify-center mb-4">
     <img
@@ -119,7 +149,7 @@ const LogoHeader = () => (
     />
   </div>
 );
-// 1) Build a theme that includes Amplify's built-in dark override
+
 const darkTheme = {
   name: "my-dark-theme",
   overrides: [defaultDarkModeOverride],
@@ -129,11 +159,9 @@ function AuthGate() {
   const { route } = useAuthenticator((ctx) => [ctx.route]);
 
   if (route === "authenticated") {
-    //  ➤ Once you’re in, just render your app at full width
     return <App />;
   }
 
-  //  ➤ While signing in/up, use the constrained Authenticator
   return null;
 }
 
