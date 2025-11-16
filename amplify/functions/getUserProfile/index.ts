@@ -1,97 +1,114 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import type {
-  APIGatewayProxyEventV2,
-  APIGatewayProxyStructuredResultV2,
-} from "aws-lambda";
+// ============================================
+// 2. GETUSERPROFILE
+// ============================================
+// Gets complete user profile by email or userId
 
-const region = process.env.AWS_REGION ?? "us-east-1";
-const USERS_TABLE_NAME = process.env.USERS_TABLE_NAME ?? "Users";
-const USER_PROFILES_TABLE_NAME = process.env.USER_PROFILES_TABLE_NAME ?? "UserProfiles";
-const EMERGENCY_CONTACTS_TABLE_NAME =
-  process.env.EMERGENCY_CONTACTS_TABLE_NAME ?? "EmergencyContacts";
-const ADDRESSES_TABLE_NAME = process.env.ADDRESSES_TABLE_NAME ?? "Addresses";
+import { DynamoDBClient as Client2 } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient as DocClient2, GetCommand as GetCmd2 } from "@aws-sdk/lib-dynamodb";
 
-const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({ region }));
+const client2 = new Client2({ region: "us-east-1" });
+const docClient2 = DocClient2.from(client2);
 
-const jsonResponse = (
-  statusCode: number,
-  body: Record<string, unknown>
-): APIGatewayProxyStructuredResultV2 => ({
-  statusCode,
-  headers: {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  },
-  body: JSON.stringify(body),
-});
-
-export const handler = async (
-  event: APIGatewayProxyEventV2
-): Promise<APIGatewayProxyStructuredResultV2> => {
+export const handler2 = async (event) => {
   try {
     const email = event.queryStringParameters?.email;
     const userId = event.queryStringParameters?.userId;
 
     if (!email && !userId) {
-      return jsonResponse(400, { error: "email or userId is required" });
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: "email or userId is required" }),
+      };
     }
 
     let actualUserId = userId;
 
+    // If email provided, look up userId in Users table (PK: email)
     if (email && !userId) {
-      const userResult = await docClient.send(
-        new GetCommand({
-          TableName: USERS_TABLE_NAME,
+      const userResult = await docClient2.send(
+        new GetCmd2({
+          TableName: "Users",
           Key: { email },
         })
       );
 
       if (!userResult.Item) {
-        return jsonResponse(404, { error: "User not found" });
+        return {
+          statusCode: 404,
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+          body: JSON.stringify({ error: "User not found" }),
+        };
       }
 
-      actualUserId = userResult.Item.userId as string;
+      actualUserId = userResult.Item.userId;
     }
 
     if (!actualUserId) {
-      return jsonResponse(404, { error: "User not found" });
+      return {
+        statusCode: 404,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: "User ID not found" }),
+      };
     }
 
-    const profileResult = await docClient.send(
-      new GetCommand({
-        TableName: USER_PROFILES_TABLE_NAME,
+    // Get UserProfile (PK: userId)
+    const profileResult = await docClient2.send(
+      new GetCmd2({
+        TableName: "UserProfiles",
         Key: { userId: actualUserId },
       })
     );
 
     if (!profileResult.Item) {
-      return jsonResponse(404, { error: "Profile not found" });
+      return {
+        statusCode: 404,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: "Profile not found" }),
+      };
     }
 
     const profile = profileResult.Item;
 
-    const contactResult = await docClient.send(
-      new GetCommand({
-        TableName: EMERGENCY_CONTACTS_TABLE_NAME,
-        Key: { contactId: profile.emergencyContactId },
-      })
-    );
+    // Get EmergencyContact (PK: contactId)
+    let emergencyContact = {};
+    if (profile.emergencyContactId) {
+      const contactResult = await docClient2.send(
+        new GetCmd2({
+          TableName: "EmergencyContacts",
+          Key: { contactId: profile.emergencyContactId },
+        })
+      );
+      emergencyContact = contactResult.Item || {};
+    }
 
-    const addressResult = await docClient.send(
-      new GetCommand({
-        TableName: ADDRESSES_TABLE_NAME,
-        Key: { addressId: profile.addressId },
-      })
-    );
+    // Get AddressInfo (PK: addressId)
+    let address = {};
+    if (profile.addressId) {
+      const addressResult = await docClient2.send(
+        new GetCmd2({
+          TableName: "AddressInfo",
+          Key: { addressId: profile.addressId },
+        })
+      );
+      address = addressResult.Item || {};
+    }
 
-    return jsonResponse(200, {
-      ...profile,
-      emergencyContact: contactResult.Item ?? {},
-      address: addressResult.Item ?? {},
-    });
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({
+        ...profile,
+        emergencyContact,
+        address,
+      }),
+    };
   } catch (error) {
     console.error("Error:", error);
-    return jsonResponse(500, { error: (error as Error).message });
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };

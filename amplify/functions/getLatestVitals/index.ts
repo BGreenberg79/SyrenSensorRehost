@@ -1,87 +1,104 @@
-import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import {
-  DynamoDBDocumentClient,
-  GetCommand,
-  QueryCommand,
-} from "@aws-sdk/lib-dynamodb";
-import type {
-  APIGatewayProxyEventV2,
-  APIGatewayProxyStructuredResultV2,
-} from "aws-lambda";
+// ============================================
+// 4. GETLATESTVITALS
+// ============================================
+// Gets most recent vital for user (PK: userId, SK: timestamp)
 
-const region = process.env.AWS_REGION ?? "us-east-1";
-const USERS_TABLE_NAME = process.env.USERS_TABLE_NAME ?? "Users";
-const VITALS_TABLE_NAME = process.env.VITALS_TABLE_NAME ?? "Vitals";
+import { DynamoDBClient as Client4 } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient as DocClient4, QueryCommand as QueryCmd4, GetCommand as GetCmd4 } from "@aws-sdk/lib-dynamodb";
 
-const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({ region }));
+const client4 = new Client4({ region: "us-east-1" });
+const docClient4 = DocClient4.from(client4);
 
-const jsonResponse = (
-  statusCode: number,
-  body: Record<string, unknown>
-): APIGatewayProxyStructuredResultV2 => ({
-  statusCode,
-  headers: {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  },
-  body: JSON.stringify(body),
-});
-
-export const handler = async (
-  event: APIGatewayProxyEventV2
-): Promise<APIGatewayProxyStructuredResultV2> => {
+export const handler4 = async (event) => {
   try {
     const email = event.queryStringParameters?.email;
     const userId = event.queryStringParameters?.userId;
 
     if (!email && !userId) {
-      return jsonResponse(400, { error: "email or userId is required" });
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: "email or userId is required" }),
+      };
     }
 
     let actualUserId = userId;
 
+    // If email provided, look up userId in Users table (PK: email)
     if (email && !userId) {
-      const userResult = await docClient.send(
-        new GetCommand({
-          TableName: USERS_TABLE_NAME,
+      const userResult = await docClient4.send(
+        new GetCmd4({
+          TableName: "Users",
           Key: { email },
         })
       );
 
       if (!userResult.Item) {
-        return jsonResponse(404, { error: "User not found" });
+        return {
+          statusCode: 404,
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+          body: JSON.stringify({ error: "User not found" }),
+        };
       }
 
-      actualUserId = userResult.Item.userId as string;
+      actualUserId = userResult.Item.userId;
     }
 
     if (!actualUserId) {
-      return jsonResponse(404, { error: "User not found" });
+      return {
+        statusCode: 404,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: "User ID not found" }),
+      };
     }
 
-    const result = await docClient.send(
-      new QueryCommand({
-        TableName: VITALS_TABLE_NAME,
+    // Query Vitals table (PK: userId, SK: timestamp), get most recent
+    const result = await docClient4.send(
+      new QueryCmd4({
+        TableName: "Vitals",
         KeyConditionExpression: "userId = :userId",
         ExpressionAttributeValues: {
           ":userId": actualUserId,
         },
-        ScanIndexForward: false,
+        ScanIndexForward: false, // Descending = most recent first
         Limit: 1,
       })
     );
 
-    const latestVital = result.Items?.[0] ?? {};
+    const latestVital = result.Items?.[0];
 
-    return jsonResponse(200, {
-      vitalsId: 0,
-      skinTemp: latestVital.skinTemp ?? 98,
-      pulse: latestVital.pulse ?? 70,
-      spO2: latestVital.spO2 ?? 98,
-      timestamp: latestVital.timestamp,
-    });
+    if (!latestVital) {
+      // Return default vitals if none exist
+      return {
+        statusCode: 200,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({
+          vitalsId: 0,
+          skinTemp: 98,
+          pulse: 70,
+          spO2: 98,
+          timestamp: null,
+        }),
+      };
+    }
+
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({
+        vitalsId: 0,
+        skinTemp: latestVital.skinTemp || 98,
+        pulse: latestVital.pulse || 70,
+        spO2: latestVital.spO2 || 98,
+        timestamp: latestVital.timestamp,
+      }),
+    };
   } catch (error) {
     console.error("Error:", error);
-    return jsonResponse(500, { error: (error as Error).message });
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };

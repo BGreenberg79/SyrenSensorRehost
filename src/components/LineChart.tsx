@@ -37,7 +37,7 @@ export default function VitalsChart() {
         const idToken = await getAuthToken();
         const userID = user.signInDetails?.loginId ?? "";
 
-        const res = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals?userID=${encodeURIComponent(userID)}`, {
+        const res = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals?email=${encodeURIComponent(userID)}`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${idToken}`,

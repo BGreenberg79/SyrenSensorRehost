@@ -26,7 +26,7 @@ export default function VitalsCard({ className = "" }: Props) {
     async function fetchVitals() {
       try {
         const idToken = await getAuthToken();
-        const url = `https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals?userID=${encodeURIComponent(user.signInDetails?.loginId ?? "")}`;        const res = await fetch(url, {
+        const url = `https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals?email=${encodeURIComponent(user.signInDetails?.loginId ?? "")}`;        const res = await fetch(url, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${idToken}`,

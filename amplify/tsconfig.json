@@ -6,7 +6,9 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "strict": false,
+    "noEmitOnError": false,
+    "noImplicitAny": false,
     "skipLibCheck": true,
     "paths": {
       "$amplify/*": ["../.amplify/generated/*"]

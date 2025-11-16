@@ -1,70 +1,47 @@
+// ============================================
+// 1. SAVEUSERPROFILE
+// ============================================
+// Saves complete user registration including profile, emergency contact, and address
+
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
-import type {
-  APIGatewayProxyEventV2,
-  APIGatewayProxyStructuredResultV2,
-} from "aws-lambda";
-import { randomUUID } from "node:crypto";
+import { DynamoDBDocumentClient, PutCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { randomUUID } from "crypto";
 
-const region = process.env.AWS_REGION ?? "us-east-1";
-const USERS_TABLE_NAME = process.env.USERS_TABLE_NAME ?? "Users";
-const USER_PROFILES_TABLE_NAME = process.env.USER_PROFILES_TABLE_NAME ?? "UserProfiles";
-const EMERGENCY_CONTACTS_TABLE_NAME =
-  process.env.EMERGENCY_CONTACTS_TABLE_NAME ?? "EmergencyContacts";
-const ADDRESSES_TABLE_NAME = process.env.ADDRESSES_TABLE_NAME ?? "Addresses";
+const client = new DynamoDBClient({ region: "us-east-1" });
+const docClient = DynamoDBDocumentClient.from(client);
 
-const docClient = DynamoDBDocumentClient.from(new DynamoDBClient({ region }));
-
-const jsonResponse = (
-  statusCode: number,
-  body: Record<string, unknown>
-): APIGatewayProxyStructuredResultV2 => ({
-  statusCode,
-  headers: {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  },
-  body: JSON.stringify(body),
-});
-
-export const handler = async (
-  event: APIGatewayProxyEventV2
-): Promise<APIGatewayProxyStructuredResultV2> => {
+export const handler = async (event) => {
   try {
-    const body = JSON.parse(event.body ?? "{}");
+    const body = JSON.parse(event.body || "{}");
+    
     const {
       email,
-      patientFirstName,
-      patientLastName,
-      firstName: contactFirstName,
-      lastName: contactLastName,
+      firstName,
+      lastName,
       phoneNumber,
       relationship,
       height,
       weight,
-      age,
-      name,
-      buildingNumber,
-      street,
-      aptUnitNumber,
-      city,
-      state,
-      zipCode,
-      country,
-    } = body as Record<string, string>;
+    } = body;
 
     if (!email) {
-      return jsonResponse(400, { error: "email is required" });
+      return {
+        statusCode: 400,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ error: "email is required" }),
+      };
     }
 
+    // Generate UUIDs for related records
     const userId = randomUUID();
     const contactId = randomUUID();
     const addressId = randomUUID();
     const now = new Date().toISOString();
 
+    // 1. Create Users record (PK: email)
     await docClient.send(
       new PutCommand({
-        TableName: USERS_TABLE_NAME,
+        TableName: "Users",
         Item: {
           email,
           userId,
@@ -73,25 +50,18 @@ export const handler = async (
       })
     );
 
-    const normalizedFullName = (name ?? "").trim();
-    const [fallbackFirstName = "", ...restOfName] = normalizedFullName
-      .split(/\s+/)
-      .filter(Boolean);
-    const fallbackLastName = restOfName.join(" ");
-
+    // 2. Create UserProfiles record (PK: userId)
     await docClient.send(
       new PutCommand({
-        TableName: USER_PROFILES_TABLE_NAME,
+        TableName: "UserProfiles",
         Item: {
           userId,
           email,
-          firstName: patientFirstName ?? fallbackFirstName,
-          lastName: patientLastName ?? fallbackLastName,
-          age: age ? Number.parseInt(age, 10) : 0,
-          gender: "",
-          height: height ?? "",
-          weight: weight ? Number.parseInt(weight, 10) : 0,
-          phoneNumber: phoneNumber ?? "",
+          firstName: firstName || "",
+          lastName: lastName || "",
+          phoneNumber: phoneNumber || "",
+          height: height || "",
+          weight: weight || "",
           emergencyContactId: contactId,
           addressId,
           createdAt: now,
@@ -99,46 +69,49 @@ export const handler = async (
       })
     );
 
+    // 3. Create EmergencyContacts record (PK: contactId)
     await docClient.send(
       new PutCommand({
-        TableName: EMERGENCY_CONTACTS_TABLE_NAME,
+        TableName: "EmergencyContacts",
         Item: {
           contactId,
           userId,
-          firstName: contactFirstName ?? "",
-          lastName: contactLastName ?? "",
-          phoneNumber: phoneNumber ?? "",
-          relationship: relationship ?? "",
+          firstName: firstName || "",
+          lastName: lastName || "",
+          phoneNumber: phoneNumber || "",
+          relationship: relationship || "",
           createdAt: now,
         },
       })
     );
 
+    // 4. Create AddressInfo record (PK: addressId)
     await docClient.send(
       new PutCommand({
-        TableName: ADDRESSES_TABLE_NAME,
+        TableName: "AddressInfo",
         Item: {
           addressId,
           userId,
-          buildingNumber: buildingNumber ?? "",
-          street: street ?? "",
-          aptUnitNumber: aptUnitNumber ?? "",
-          city: city ?? "",
-          state: state ?? "",
-          zipCode: zipCode ?? "",
-          country: country ?? "",
           createdAt: now,
         },
       })
     );
 
-    return jsonResponse(200, {
-      message: "Profile saved successfully",
-      userId,
-      email,
-    });
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({
+        message: "Profile saved successfully",
+        userId,
+        email,
+      }),
+    };
   } catch (error) {
     console.error("Error:", error);
-    return jsonResponse(500, { error: (error as Error).message });
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ error: error.message }),
+    };
   }
 };
