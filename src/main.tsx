@@ -16,7 +16,6 @@ Amplify.configure(outputs);
 
 const formFields = {
 	signUp: {
-		// Basic Information
 		firstName: {
 			order: 1,
 			label: "First Name",
@@ -41,97 +40,21 @@ const formFields = {
 			placeholder: "Enter your phone number",
 			isRequired: true,
 		},
-		// Health Information
-		address: {
-			order: 5,
-			label: "Height (inches)",
-			placeholder: "e.g., 70",
-			isRequired: true,
-		},
-		birthdate: {
-			order: 6,
-			label: "Weight (lbs)",
-			placeholder: "e.g., 180",
-			isRequired: true,
-		},
 		gender: {
-			order: 7,
+			order: 5,
 			label: "Gender",
 			placeholder: "Enter your gender identity",
 			type: "text",
 		},
-		// Emergency Contact
-		family_name: {
-			order: 8,
-			label: "Emergency Contact First Name",
-			placeholder: "Enter emergency contact first name",
-			isRequired: true,
-		},
-		given_name: {
-			order: 9,
-			label: "Emergency Contact Last Name",
-			placeholder: "Enter emergency contact last name",
-			isRequired: true,
-		},
-		middle_name: {
-			order: 10,
-			label: "Emergency Contact Phone",
-			placeholder: "Enter emergency contact phone",
-			isRequired: true,
-		},
-		nickname: {
-			order: 11,
-			label: "Relationship to Emergency Contact",
-			placeholder: "e.g., Sister, Brother, Parent",
-			isRequired: true,
-		},
-		// Address
-		street_address: {
-			order: 12,
-			label: "Street Address",
-			placeholder: "Enter your street address",
-			isRequired: false,
-		},
-		apartment_number: {
-			order: 13,
-			label: "Apartment/Unit Number (optional)",
-			placeholder: "Apt, Suite, Unit number",
-			isRequired: false,
-		},
-		locality: {
-			order: 14,
-			label: "City",
-			placeholder: "Enter your city",
-			isRequired: false,
-		},
-		region: {
-			order: 15,
-			label: "State",
-			placeholder: "Enter your state",
-			isRequired: false,
-		},
-		postal_code: {
-			order: 16,
-			label: "Zip Code",
-			placeholder: "Enter your zip code",
-			isRequired: false,
-		},
-		country: {
-			order: 17,
-			label: "Country",
-			placeholder: "Enter your country",
-			isRequired: false,
-		},
-		// Security
 		password: {
-			order: 18,
+			order: 6,
 			label: "Password",
 			placeholder: "Create a strong password",
 			isRequired: true,
 			type: "password",
 		},
 		confirm_password: {
-			order: 19,
+			order: 7,
 			label: "Confirm Password",
 			placeholder: "Confirm your password",
 			isRequired: true,

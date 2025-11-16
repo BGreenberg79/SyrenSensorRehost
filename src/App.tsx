@@ -76,10 +76,11 @@ function EMSModal() {
 function App() {
   const { user } = useAuthenticator();
   const [isLoading, setIsLoading] = useState(true);
+  const [isFirstTime, setIsFirstTime] = useState(false);
   const { setSettingsState } = useSettingsContext();
 
   useEffect(() => {
-    const loadUserData = async () => {
+    const checkProfileAndLoad = async () => {
       const email = user?.signInDetails?.loginId;
 
       if (!email) {
@@ -98,7 +99,7 @@ function App() {
           return;
         }
 
-        // Fetch user profile
+        // Try to fetch user profile
         const res = await fetch(
           `https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles?email=${encodeURIComponent(email)}`,
           {
@@ -110,8 +111,11 @@ function App() {
         );
 
         if (!res.ok) {
-          const errorText = await res.text();
-          throw new Error(`HTTP ${res.status}: ${errorText}`);
+          // Profile doesn't exist - first time user
+          console.log("Profile not found - redirecting to Settings");
+          setIsFirstTime(true);
+          setIsLoading(false);
+          return;
         }
 
         const profile = await res.json();
@@ -124,7 +128,7 @@ function App() {
             ...prev.user,
             firstName: profile.firstName || "—",
             lastName: profile.lastName || "—",
-            age: parseInt(profile.weight) || 0,
+            age: parseInt(profile.age) || 0,
             gender: profile.gender || "—",
             height: profile.height || "—",
             weight: profile.weight || "—",
@@ -151,15 +155,20 @@ function App() {
         console.log("User data loaded into context");
       } catch (err) {
         console.error("Failed to fetch profile:", err);
+        setIsFirstTime(true);
       } finally {
         setIsLoading(false);
       }
     };
 
     if (user) {
-      loadUserData();
+      checkProfileAndLoad();
     }
   }, [user, setSettingsState]);
+
+  if (isLoading) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
 
   if (window.location.pathname === "/opt-in") {
     return (
@@ -169,24 +178,36 @@ function App() {
     );
   }
 
-  return (
-    <main>
-      {isLoading ? (
-        <p className="text-center mt-10">Loading profile...</p>
-      ) : (
+  // First time user - go to Settings
+  if (isFirstTime) {
+    return (
+      <main>
         <div className="flex flex-col min-h-screen">
           <div className="flex-grow">
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<PatientDashboard />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/fitbit/callback" element={<FitbitCallback />} />
-            </Routes>
+            <Settings isFirstTime={true} />
           </div>
           <NavBar />
           <EMSModal />
         </div>
-      )}
+      </main>
+    );
+  }
+
+  // Returning user - normal routes
+  return (
+    <main>
+      <div className="flex flex-col min-h-screen">
+        <div className="flex-grow">
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard" element={<PatientDashboard />} />
+            <Route path="/settings" element={<Settings isFirstTime={false} />} />
+            <Route path="/fitbit/callback" element={<FitbitCallback />} />
+          </Routes>
+        </div>
+        <NavBar />
+        <EMSModal />
+      </div>
     </main>
   );
 }
