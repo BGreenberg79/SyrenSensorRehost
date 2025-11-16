@@ -7,7 +7,6 @@ export const schema = a.schema({
       email: a.string(),
       userId: a.string(),
       createdAt: a.string(),
-      updatedAt: a.string(),
     })
     .identifier(["email"])
     .authorization((allow) => [allow.authenticated()]),
