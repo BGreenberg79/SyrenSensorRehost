@@ -16,6 +16,12 @@ Amplify.configure(outputs);
 
 const formFields = {
 	signUp: {
+				name: {
+			order: 0,
+			label: "",
+			placeholder: "",
+			isRequired: false,
+		},
 		firstName: {
 			order: 1,
 			label: "First Name",
