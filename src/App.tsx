@@ -83,9 +83,9 @@ function App() {
 
   useEffect(() => {
     const checkProfile = async () => {
-      const userID = user?.signInDetails?.loginId;
+      const email = user?.signInDetails?.loginId;
 
-      if (!userID) {
+      if (!email) {
         console.warn("User not ready yet");
         return;
       }
@@ -99,7 +99,7 @@ function App() {
           return;
         }
 
-        const res = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles?userID=${encodeURIComponent(userID)}`, {
+        const res = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles?email=${encodeURIComponent(email)}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${idToken}`,
@@ -157,14 +157,14 @@ function App() {
 
     try {
       // Get name + dob from UserSignUp
-      const signupRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/devprofiles?userID=${encodeURIComponent(loginId)}`, {
+      const signupRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/devprofiles?email=${encodeURIComponent(loginId)}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${idToken}` },
       });
       const signupData = await signupRes.json();
     
       // Get height + weight from emergencyContacts
-      const contactRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/get-profile?userID=${encodeURIComponent(loginId)}`, {
+      const contactRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/get-profile?email=${encodeURIComponent(loginId)}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${idToken}` },
       });
