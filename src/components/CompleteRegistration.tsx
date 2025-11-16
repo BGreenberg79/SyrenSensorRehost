@@ -41,13 +41,13 @@ export default function CompleteRegistration() {
           Authorization: `Bearer ${idToken}`, 
         },
         body: JSON.stringify({
-          userID,
-          firstName: formData.emergencyFirstName,
-          lastName: formData.emergencyLastName,
-          phoneNumber: formData.emergencyPhone,
-          relationship: formData.relationship,
-          height: formData.height,
-          weight: formData.weight,
+  email: userID,  // This is the email from Cognito
+  firstName: formData.emergencyFirstName,
+  lastName: formData.emergencyLastName,
+  phoneNumber: formData.emergencyPhone,
+  relationship: formData.relationship,
+  height: formData.height,
+  weight: formData.weight,
         }),
       });
 

@@ -164,7 +164,7 @@ function App() {
       const signupData = await signupRes.json();
     
       // Get height + weight from emergencyContacts
-      const contactRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles?userID=${encodeURIComponent(loginId)}`, {
+      const contactRes = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/get-profile?userID=${encodeURIComponent(loginId)}`, {
         method: "GET",
         headers: { Authorization: `Bearer ${idToken}` },
       });

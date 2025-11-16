@@ -65,5 +65,47 @@
       "service": "amplifyhosting",
       "type": "manual"
     }
+  },
+  "parameters": {
+    "AMPLIFY_function_syrensensor6dc1427fPostConfirmation_GROUP": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "syrensensor6dc1427fPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_syrensensor6dc1427fPostConfirmation_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "syrensensor6dc1427fPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_function_syrensensor6dc1427fPostConfirmation_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "syrensensor6dc1427fPostConfirmation"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_appId": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
+    },
+    "AMPLIFY_hosting_amplifyhosting_type": {
+      "usedBy": [
+        {
+          "category": "hosting",
+          "resourceName": "amplifyhosting"
+        }
+      ]
+    }
   }
 }

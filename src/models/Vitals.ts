@@ -3,4 +3,5 @@ export interface Vitals {
   skinTemp: number;
   pulse: number;
   spO2: number;
+  timestamp?: number;
 }
