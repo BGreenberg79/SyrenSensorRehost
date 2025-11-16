@@ -7,7 +7,7 @@ export const schema = a.schema({
     })
     .authorization((allow) => [allow.owner()]),
 
-     HealthSnapshot: a
+  HealthSnapshot: a
     .model({
       userID: a.id(),
       heartRate: a.integer(),
@@ -18,7 +18,9 @@ export const schema = a.schema({
     .secondaryIndexes((index) => [
       index("userID").sortKeys(["timestamp"]),
     ]),
-    WearableRawData: a
+
+
+  WearableRawData: a
     .model({
       userID: a.id(),
       timestamp: a.timestamp(),
@@ -31,4 +33,5 @@ export const schema = a.schema({
       index("userID").sortKeys(["timestamp"]),
     ]),
 });
+
 export type Schema = ClientSchema<typeof schema>;
