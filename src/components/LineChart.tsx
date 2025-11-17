@@ -12,16 +12,21 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-type HealthSnapshot = {
-  userID: string;
-  heartRate: number;
-  oxygenLevel: number;
-  timestamp: string | number;
+type VitalsSnapshot = {
+  vitalsId: number;
+  skinTemp: number;
+  pulse: number;
+  spO2: number;
+  timestamp: number;
+};
+
+type ChartDataPoint = VitalsSnapshot & {
+  date: string;
 };
 
 export default function VitalsChart() {
   const { user } = useAuthenticator();
-  const [vitalsData, setVitalsData] = useState<HealthSnapshot[]>([]);
+  const [vitalsData, setVitalsData] = useState<ChartDataPoint[]>([]);
 
   async function getAuthToken() {
     const session = await fetchAuthSession();
@@ -49,13 +54,29 @@ export default function VitalsChart() {
           throw new Error(`HTTP ${res.status}: ${errorText}`);
         }
 
-        const data = await res.json();
+        const responseData = await res.json();
+        
+        // Handle Lambda response structure
+        let vitalsArray: VitalsSnapshot[];
+        
+        if (Array.isArray(responseData)) {
+          // Direct array response
+          vitalsArray = responseData;
+        } else if (responseData.body) {
+          // Lambda response with body property (might be stringified)
+          vitalsArray = typeof responseData.body === 'string' 
+            ? JSON.parse(responseData.body) 
+            : responseData.body;
+        } else {
+          console.error('Unexpected API response structure:', responseData);
+          vitalsArray = [];
+        }
 
-        const sorted = data.sort((a: HealthSnapshot, b: HealthSnapshot) =>
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
-        );
+        // Sort by timestamp (ascending)
+        const sorted = vitalsArray.sort((a, b) => a.timestamp - b.timestamp);
 
-        const formatted = sorted.map((entry:HealthSnapshot) => ({
+        // Format for chart display
+        const formatted: ChartDataPoint[] = sorted.map((entry) => ({
           ...entry,
           date: new Date(entry.timestamp).toLocaleDateString(),
         }));
@@ -75,12 +96,12 @@ export default function VitalsChart() {
         <LineChart data={vitalsData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="date" />
-          <YAxis yAxisId="left" label={{ value: 'Heart Rate', angle: -90, position: 'insideLeft' }} />
-          <YAxis yAxisId="right" orientation="right" label={{ value: 'Oxygen Level', angle: -90, position: 'insideRight' }} />
+          <YAxis yAxisId="left" label={{ value: 'Pulse (bpm)', angle: -90, position: 'insideLeft' }} />
+          <YAxis yAxisId="right" orientation="right" label={{ value: 'SpO2 (%)', angle: -90, position: 'insideRight' }} />
           <Tooltip />
           <Legend />
-          <Line yAxisId="left" type="monotone" dataKey="heartRate" stroke="#8884d8" name="Heart Rate (bpm)" />
-          <Line yAxisId="right" type="monotone" dataKey="oxygenLevel" stroke="#82ca9d" name="Oxygen Level (%)" />
+          <Line yAxisId="left" type="monotone" dataKey="pulse" stroke="#8884d8" name="Pulse (bpm)" />
+          <Line yAxisId="right" type="monotone" dataKey="spO2" stroke="#82ca9d" name="SpO2 (%)" />
         </LineChart>
       </ResponsiveContainer>
     </div>
