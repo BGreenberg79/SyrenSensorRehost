@@ -125,7 +125,11 @@ export default function Settings({ isFirstTime = false, onProfileSaved }: Settin
   
   return (
     <div className="min-h-screen bg-[#2b2b2c] p-6 flex flex-col items-center justify-start mb-10">
-      <img className='w-60 h-60 mb-6 mx-auto bg-[#2b2b2c]' alt="Syren Sensor Logo" src={syrenLogo}/>
+      <img
+  className="w-28 h-28 sm:w-36 sm:h-36 md:w-40 md:h-40 mb-6 mx-auto bg-[#2b2b2c]"
+  alt="Syren Sensor Logo"
+  src={syrenLogo}
+/>
       
       {isFirstTime && <h1 className="text-white text-3xl font-bold mb-2">Complete Your Profile</h1>}
 

@@ -158,13 +158,28 @@ export default function VitalsChart() {
     fetchVitals();
   }, [user]);
 
-  if (loading) return <div className="w-full h-[400px] flex items-center justify-center text-white">Loading chart...</div>;
-  
-  if (error) return <div className="w-full h-[400px] flex items-center justify-center text-red-500">Error: {error}</div>;
+  if (loading)
+  return (
+    <div className="w-full h-[260px] sm:h-[320px] flex items-center justify-center text-white">
+      Loading chart...
+    </div>
+  );
+
+  if (error)
+  return (
+    <div className="w-full h-[260px] sm:h-[320px] flex items-center justify-center text-red-500">
+      Error: {error}
+    </div>
+  );
 
   if (vitalsData.length === 0) {
-    return <div className="w-full h-[400px] flex items-center justify-center text-white">No vitals data available</div>;
-  }
+  return (
+    <div className="w-full h-[260px] sm:h-[320px] flex items-center justify-center text-white">
+      No vitals data available
+    </div>
+  );
+}
+
 
 return (
   <div className="w-full h-full">

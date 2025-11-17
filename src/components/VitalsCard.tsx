@@ -96,7 +96,7 @@ export default function VitalsCard({ className = "" }: Props) {
 
   return (
     <div id="vitals-title" className={`${className} text-white`}>
-      <h2 className="text-lg font-semibold mb-2">Latest Vitals</h2>
+      <h2 className="text-base sm:text-lg font-semibold mb-2">Latest Vitals</h2>
       <p>Heart Rate: <span className="font-bold">{latestSnapshot.pulse} bpm</span></p>
       <p>Oxygen Level: <span className="font-bold">{latestSnapshot.spO2}%</span></p>
       <p>Skin Temperature: <span className="font-bold">{latestSnapshot.skinTemp}°F</span></p>
