@@ -179,9 +179,11 @@ function App() {
             primaryAddress: {
               ...prev.user.primaryAddress,
               street: profile.address?.street || "—",
+              aptUnitNumber: profile.address?.aptUnitNumber || "—",
               city: profile.address?.city || "—",
               state: profile.address?.state || "—",
               zipCode: profile.address?.zipCode || "—",
+              country: profile.address?.country || "—",
             },
           },
           emergencyContact: {
