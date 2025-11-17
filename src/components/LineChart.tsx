@@ -142,11 +142,11 @@ export default function VitalsChart() {
   }
 
   return (
-    <div className="w-full h-[400px]">
+    <div className="w-full h-screen flex items-center justify-center">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={vitalsData}>
+        <LineChart data={vitalsData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
+          <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} />
           <YAxis yAxisId="left" label={{ value: 'Pulse (bpm)', angle: -90, position: 'insideLeft' }} />
           <YAxis yAxisId="right" orientation="right" label={{ value: 'SpO2 (%)', angle: -90, position: 'insideRight' }} />
           <Tooltip />
