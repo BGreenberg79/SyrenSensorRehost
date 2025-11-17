@@ -25,10 +25,10 @@ export default function PatientDashboard() {
               <span className="font-normal">{fullName}</span>
               
             </p>
-            <p className="text-white mb-2 capitalize">
+            {/* <p className="text-white mb-2 capitalize">
               <span className="font-semibold">Age:</span>{" "}
               <span className="font-normal">{settingsState.user.age}</span>
-            </p>
+            </p> */}
             <p className="text-white mb-2 capitalize">
               <span className="font-semibold">Gender:</span>{" "}
               <span className="font-normal">{settingsState.user.gender}</span>

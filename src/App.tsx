@@ -171,7 +171,7 @@ function App() {
             ...prev.user,
             firstName: profile.firstName || "—",
             lastName: profile.lastName || "—",
-            age: profile.birthdate ? new Date().getFullYear() - new Date(profile.birthdate).getFullYear() : 0,
+            // age: profile.birthdate ? new Date().getFullYear() - new Date(profile.birthdate).getFullYear() : 0,
             gender: profile.gender || "—",
             height: profile.height || "—",
             weight: profile.weight || "—",

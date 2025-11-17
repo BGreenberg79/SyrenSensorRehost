@@ -70,26 +70,56 @@ export default function Settings({ isFirstTime = false, onProfileSaved }: Settin
       }
 
       alert("Profile saved successfully!");
-      setIsSaving(false);
+      // setIsSaving(false);
 
-      // Generate vitals if first time user
-      if (isFirstTime && onProfileSaved) {
+      if (isFirstTime) {
+        console.log("First time user - generating vitals...");
+        try {
+          const vitalsRes = await fetch(
+            "https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${idToken}`,
+              },
+              body: JSON.stringify({
+                email,
+                numDataPoints: 30,
+              }),
+            }
+          );
+
+          if (vitalsRes.ok) {
+            console.log("✓ Vitals generated successfully");
+          } else {
+            const errorText = await vitalsRes.text();
+            console.error("Failed to generate vitals:", vitalsRes.status, errorText);
+          }
+        } catch (vitalsErr) {
+          console.error("Error generating vitals:", vitalsErr);
+        }
+      }
+      // Step 3: Call onProfileSaved callback if provided
+      if (onProfileSaved) {
         await onProfileSaved();
       }
 
+      setIsSaving(false);
+
+      // Step 4: Navigate to dashboard for first time users
       if (isFirstTime) {
-        setTimeout(()=>{
-          navigate("/dashboard", { replace: true, state: { isFirstTime: false} })
+        setTimeout(() => {
+          navigate("/dashboard", { replace: true, state: { isFirstTime: false } });
         }, 500);
       }
     } catch (err) {
       console.error("Error saving profile:", err);
       alert("Failed to save profile. " + (err instanceof Error ? err.message : "Please try again."));
-    } finally {
       setIsSaving(false);
     }
   };
-
+  
   return (
     <div className="min-h-screen bg-[#2b2b2c] p-6 flex flex-col items-center justify-start mb-10">
       <img className='w-60 h-60 mb-6 mx-auto bg-[#2b2b2c]' alt="Syren Sensor Logo" src={syrenLogo}/>

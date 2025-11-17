@@ -36,7 +36,7 @@ const defaultState: SettingsState = {
     userId: 0,
     firstName: "",
     lastName: "",
-    age: 0,
+    // age: 0,
     gender: null,
     height: "",
     weight: "",
