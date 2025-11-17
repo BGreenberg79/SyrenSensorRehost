@@ -16,7 +16,8 @@ export default function PatientDashboard() {
       <div className="flex flex-col items-center w-full">
         <h1 id='dashboard-title' className='sr-only'>Syren Sensor</h1>
         <img className='w-40 h-40 mb-6 mx-auto bg-[#2b2b2c]' alt="Syren Sensor Logo" src={syrenLogo}/>
-        <div className="w-full bg-black rounded-2xl border border-blue-500 shadow-lg px-4 sm:px-8 py-10 text-white space-y-8">
+        <div className="w-full max-w-5xl bg-black rounded-2xl border border-blue-500 shadow-lg px-4 sm:px-8 py-10 text-white space-y-8">
+
           <section aria-labelledby="patient-info-title">
             <h3 id='patient-info-title' className="text-white text-lg font-semibold mb-2">Patient Info:</h3>
 
@@ -42,10 +43,19 @@ export default function PatientDashboard() {
             <VitalsCard className="text-white"/>
           </section>
           
-          <section aria-labelledby="chart-title" className="mt-8 w-full">
-            <h3 id="chart-title" className="text-white text-lg font-semibold mb-2">Vitals (Last 30 Days)</h3>
-            <VitalsChart />
-          </section>
+<section aria-labelledby="chart-title" className="mt-8 w-full min-w-0">
+  <h3 id="chart-title" className="text-white text-lg font-semibold mb-2">
+    Vitals (Last 30 Days)
+  </h3>
+
+  {/* Chart width + height control */}
+  <div className="w-full overflow-x-auto">
+    <div className="min-w-[600px] h-[320px]">
+      <VitalsChart />
+    </div>
+  </div>
+</section>
+
         </div>
       </div>
     </div>

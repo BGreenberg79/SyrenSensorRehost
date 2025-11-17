@@ -87,6 +87,8 @@ export default function VitalsChart() {
           setError("Unknown API response format");
           return;
         }
+        console.log("📊 Step 1: vitalsArray length:", vitalsArray.length);
+        console.log("📊 Step 1: vitalsArray sample:", vitalsArray.slice(0, 5));
 
         if (!Array.isArray(vitalsArray)) {
           console.error("📊 LineChart: Final vitals is not an array");
@@ -94,34 +96,56 @@ export default function VitalsChart() {
           return;
         }
 
-        // Filter out entries with null timestamps
-        const validVitals = vitalsArray.filter(v => v.timestamp !== null && v.timestamp !== undefined);
-        
+
+        // Normalize timestamps and filter out entries with null timestamps
+        const validVitals = vitalsArray
+          .map((v) => {
+            if (v.timestamp === null || v.timestamp === undefined) return v;
+
+            let ts = v.timestamp;
+
+            // If it's probably seconds (e.g. 1731791676), convert to ms
+            if (ts < 10_000_000_000) {
+              ts = ts * 1000;
+            }
+
+            return { ...v, timestamp: ts };
+          })
+          .filter((v) => v.timestamp !== null && v.timestamp !== undefined);
+
+        console.log("📊 Step 2: validVitals length:", validVitals.length);
+        console.log("📊 Step 2: validVitals sample:", validVitals.slice(0, 5));
+
         if (validVitals.length === 0) {
           console.warn("📊 LineChart: No valid vitals with timestamps");
           setError("No vitals data with timestamps available");
           return;
         }
 
+
+        // Sort by timestamp (ascending)
         // Sort by timestamp (ascending)
         const sorted = validVitals.sort((a, b) => a.timestamp - b.timestamp);
 
         // Format for chart display - show actual dates ONLY
         const formatted: ChartDataPoint[] = sorted.map((entry) => {
           const date = new Date(entry.timestamp);
-          const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+          const dateStr = date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+          });
           return {
-            vitalsId: entry.vitalsId || 0,
-            skinTemp: entry.skinTemp || 98,
-            pulse: entry.pulse || 70,
-            spO2: entry.spO2 || 98,
-            timestamp: entry.timestamp,
+            ...entry,
             date: dateStr,
           };
         });
 
-        console.log("📊 LineChart: Formatted data length:", formatted.length);
+        const uniqueDates = [...new Set(formatted.map((f) => f.date))];
+        console.log("📊 Step 3: formatted length:", formatted.length);
+        console.log("📊 Step 3: unique date labels:", uniqueDates);
+
         setVitalsData(formatted);
+
       } catch (err) {
         console.error('📊 LineChart: Error fetching vitals:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
@@ -142,11 +166,11 @@ export default function VitalsChart() {
   }
 
 return (
-  <div className="w-full h-[280px] sm:h-[340px] md:h-[400px]">
+  <div className="w-full h-full">
     <ResponsiveContainer width="100%" height="100%">
       <LineChart
         data={vitalsData}
-        margin={{ top: 20, right: 30, left: 10, bottom: 40 }}
+        margin={{ top: 20, right: 30, left: 0, bottom: 60 }}
       >
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis
@@ -154,7 +178,7 @@ return (
           angle={-45}
           textAnchor="end"
           height={80}
-          interval={0} // force all labels if there’s enough width
+          interval={0}
         />
         <YAxis
           yAxisId="left"
