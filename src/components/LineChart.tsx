@@ -141,20 +141,48 @@ export default function VitalsChart() {
     return <div className="w-full h-[400px] flex items-center justify-center text-white">No vitals data available</div>;
   }
 
-  return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={vitalsData} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" angle={-45} textAnchor="end" height={80} />
-          <YAxis yAxisId="left" label={{ value: 'Pulse (bpm)', angle: -90, position: 'insideLeft' }} />
-          <YAxis yAxisId="right" orientation="right" label={{ value: 'SpO2 (%)', angle: -90, position: 'insideRight' }} />
-          <Tooltip />
-          <Legend />
-          <Line yAxisId="left" type="monotone" dataKey="pulse" stroke="#8884d8" name="Pulse (bpm)" />
-          <Line yAxisId="right" type="monotone" dataKey="spO2" stroke="#82ca9d" name="SpO2 (%)" />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
+return (
+  <div className="w-full h-[280px] sm:h-[340px] md:h-[400px]">
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart
+        data={vitalsData}
+        margin={{ top: 20, right: 30, left: 10, bottom: 40 }}
+      >
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis
+          dataKey="date"
+          angle={-45}
+          textAnchor="end"
+          height={80}
+          interval={0} // force all labels if there’s enough width
+        />
+        <YAxis
+          yAxisId="left"
+          label={{ value: 'Pulse (bpm)', angle: -90, position: 'insideLeft' }}
+        />
+        <YAxis
+          yAxisId="right"
+          orientation="right"
+          label={{ value: 'SpO2 (%)', angle: -90, position: 'insideRight' }}
+        />
+        <Tooltip />
+        <Legend />
+        <Line
+          yAxisId="left"
+          type="monotone"
+          dataKey="pulse"
+          stroke="#8884d8"
+          name="Pulse (bpm)"
+        />
+        <Line
+          yAxisId="right"
+          type="monotone"
+          dataKey="spO2"
+          stroke="#82ca9d"
+          name="SpO2 (%)"
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+);
 }
