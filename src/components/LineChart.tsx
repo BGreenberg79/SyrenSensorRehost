@@ -77,14 +77,19 @@ export default function VitalsChart() {
         if (Array.isArray(responseData)) {
           console.log("📊 LineChart: Detected direct array response");
           vitalsArray = responseData;
-        } else if (responseData.body) {
-          console.log("📊 LineChart: Detected body property");
-          vitalsArray = typeof responseData.body === 'string' 
-            ? JSON.parse(responseData.body) 
-            : responseData.body;
-        } else if (responseData.Items) {
+        } else if (responseData.body && typeof responseData.body === 'string') {
+          console.log("📊 LineChart: Detected stringified body property");
+          vitalsArray = JSON.parse(responseData.body);
+        } else if (responseData.body && Array.isArray(responseData.body)) {
+          console.log("📊 LineChart: Detected body array");
+          vitalsArray = responseData.body;
+        } else if (responseData.Items && Array.isArray(responseData.Items)) {
           console.log("📊 LineChart: Detected DynamoDB Items response");
           vitalsArray = responseData.Items;
+        } else if (responseData.vitalsId !== undefined || responseData.pulse !== undefined) {
+          // Single vitals object response
+          console.log("📊 LineChart: Detected single vitals object, converting to array");
+          vitalsArray = [responseData];
         } else {
           console.error("📊 LineChart: Unknown response structure:", responseData);
           setError("Unknown API response format");
@@ -100,8 +105,17 @@ export default function VitalsChart() {
           return;
         }
 
+        // Filter out entries with null timestamps
+        const validVitals = vitalsArray.filter(v => v.timestamp !== null && v.timestamp !== undefined);
+        
+        if (validVitals.length === 0) {
+          console.warn("📊 LineChart: No valid vitals with timestamps");
+          setError("No vitals data with timestamps available");
+          return;
+        }
+
         // Sort by timestamp (ascending)
-        const sorted = vitalsArray.sort((a, b) => a.timestamp - b.timestamp);
+        const sorted = validVitals.sort((a, b) => a.timestamp - b.timestamp);
 
         // Format for chart display
         const formatted: ChartDataPoint[] = sorted.map((entry) => ({
