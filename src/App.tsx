@@ -244,9 +244,9 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <div className="flex-grow">
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard" element={<PatientDashboard />} />
-            <Route path="/settings" element={<Settings isFirstTime={false} />} />
+            <Route path="/" element={<Navigate to="/dashboard/" replace />} />
+            <Route path="/dashboard/" element={<PatientDashboard />} />
+            <Route path="/settings/" element={<Settings isFirstTime={false} />} />
             <Route path="/fitbit/callback" element={<FitbitCallback />} />
           </Routes>
         </div>
