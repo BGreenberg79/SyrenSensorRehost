@@ -179,7 +179,7 @@ return (
           angle={-45}
           textAnchor="end"
           height={80}
-          interval={0}
+          interval={5}
         />
         <YAxis
           yAxisId="left"
