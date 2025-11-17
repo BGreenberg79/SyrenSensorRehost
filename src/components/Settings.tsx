@@ -34,6 +34,7 @@ export default function Settings({ isFirstTime = false, onProfileSaved }: Settin
         throw new Error("No ID token available");
       }
 
+      // Step 1: Save Profile
       const res = await fetch(
         "https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/profiles",
         {
@@ -70,36 +71,38 @@ export default function Settings({ isFirstTime = false, onProfileSaved }: Settin
       }
 
       alert("Profile saved successfully!");
-      // setIsSaving(false);
 
-      if (isFirstTime) {
-        console.log("First time user - generating vitals...");
-        try {
-          const vitalsRes = await fetch(
-            "https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
-              },
-              body: JSON.stringify({
-                email,
-                numDataPoints: 30,
-              }),
-            }
-          );
-
-          if (vitalsRes.ok) {
-            console.log("✓ Vitals generated successfully");
-          } else {
-            const errorText = await vitalsRes.text();
-            console.error("Failed to generate vitals:", vitalsRes.status, errorText);
+      // Step 2: Generate vitals - NOW ALWAYS GENERATE (not just first time)
+      console.log("💾 Generating vitals...");
+      try {
+        const vitalsRes = await fetch(
+          "https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              email,
+              numDataPoints: 30,
+            }),
           }
-        } catch (vitalsErr) {
-          console.error("Error generating vitals:", vitalsErr);
+        );
+
+        console.log("💾 Vitals response status:", vitalsRes.status);
+
+        if (vitalsRes.ok) {
+          const vitalsData = await vitalsRes.json();
+          console.log("✅ Vitals generated successfully:", vitalsData);
+        } else {
+          const errorText = await vitalsRes.text();
+          console.error("❌ Failed to generate vitals:", vitalsRes.status, errorText);
         }
+      } catch (vitalsErr) {
+        console.error("❌ Error generating vitals:", vitalsErr);
       }
+
       // Step 3: Call onProfileSaved callback if provided
       if (onProfileSaved) {
         await onProfileSaved();
