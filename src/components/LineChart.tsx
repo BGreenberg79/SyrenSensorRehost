@@ -68,36 +68,25 @@ export default function VitalsChart() {
 
         const responseData = await res.json();
         console.log("📊 LineChart: Raw response data:", responseData);
-        console.log("📊 LineChart: Response type:", typeof responseData);
-        console.log("📊 LineChart: Is Array?", Array.isArray(responseData));
 
         // Handle different response structures
         let vitalsArray: VitalsSnapshot[];
 
         if (Array.isArray(responseData)) {
-          console.log("📊 LineChart: Detected direct array response");
           vitalsArray = responseData;
         } else if (responseData.body && typeof responseData.body === 'string') {
-          console.log("📊 LineChart: Detected stringified body property");
           vitalsArray = JSON.parse(responseData.body);
         } else if (responseData.body && Array.isArray(responseData.body)) {
-          console.log("📊 LineChart: Detected body array");
           vitalsArray = responseData.body;
         } else if (responseData.Items && Array.isArray(responseData.Items)) {
-          console.log("📊 LineChart: Detected DynamoDB Items response");
           vitalsArray = responseData.Items;
         } else if (responseData.vitalsId !== undefined || responseData.pulse !== undefined) {
-          // Single vitals object response
-          console.log("📊 LineChart: Detected single vitals object, converting to array");
           vitalsArray = [responseData];
         } else {
           console.error("📊 LineChart: Unknown response structure:", responseData);
           setError("Unknown API response format");
           return;
         }
-
-        console.log("📊 LineChart: Parsed vitals array:", vitalsArray);
-        console.log("📊 LineChart: Array length:", vitalsArray.length);
 
         if (!Array.isArray(vitalsArray)) {
           console.error("📊 LineChart: Final vitals is not an array");
@@ -117,12 +106,10 @@ export default function VitalsChart() {
         // Sort by timestamp (ascending)
         const sorted = validVitals.sort((a, b) => a.timestamp - b.timestamp);
 
-        // Format for chart display - use index as unique identifier to spread points
-        const formatted: ChartDataPoint[] = sorted.map((entry, index) => {
+        // Format for chart display - show actual dates ONLY
+        const formatted: ChartDataPoint[] = sorted.map((entry) => {
           const date = new Date(entry.timestamp);
-          // Format as "Nov 17" or similar, with index to differentiate records on same day
-          const dateStr = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} #${index + 1}`;
-          console.log(`📊 Record ${index}: timestamp=${entry.timestamp}, dateStr=${dateStr}, pulse=${entry.pulse}, spO2=${entry.spO2}`);
+          const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
           return {
             vitalsId: entry.vitalsId || 0,
             skinTemp: entry.skinTemp || 98,
@@ -133,7 +120,7 @@ export default function VitalsChart() {
           };
         });
 
-        console.log("📊 LineChart: Formatted data:", formatted);
+        console.log("📊 LineChart: Formatted data length:", formatted.length);
         setVitalsData(formatted);
       } catch (err) {
         console.error('📊 LineChart: Error fetching vitals:', err);
