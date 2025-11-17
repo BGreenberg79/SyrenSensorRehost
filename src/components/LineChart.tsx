@@ -47,7 +47,8 @@ export default function VitalsChart() {
         const idToken = await getAuthToken();
         const userEmail = user.signInDetails?.loginId ?? "";
 
-        const url = `https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals?email=${encodeURIComponent(userEmail)}`;
+        const url = `https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals/history?email=${encodeURIComponent(userEmail)}`;
+
         
         console.log("📊 LineChart: Fetching from", url);
 
