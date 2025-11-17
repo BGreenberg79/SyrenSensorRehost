@@ -117,15 +117,21 @@ export default function VitalsChart() {
         // Sort by timestamp (ascending)
         const sorted = validVitals.sort((a, b) => a.timestamp - b.timestamp);
 
-        // Format for chart display
-        const formatted: ChartDataPoint[] = sorted.map((entry) => ({
-          vitalsId: entry.vitalsId || 0,
-          skinTemp: entry.skinTemp || 98,
-          pulse: entry.pulse || 70,
-          spO2: entry.spO2 || 98,
-          timestamp: entry.timestamp,
-          date: new Date(entry.timestamp).toLocaleDateString(),
-        }));
+        // Format for chart display - use index as unique identifier to spread points
+        const formatted: ChartDataPoint[] = sorted.map((entry, index) => {
+          const date = new Date(entry.timestamp);
+          // Format as "Nov 17" or similar, with index to differentiate records on same day
+          const dateStr = `${date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} #${index + 1}`;
+          console.log(`📊 Record ${index}: timestamp=${entry.timestamp}, dateStr=${dateStr}, pulse=${entry.pulse}, spO2=${entry.spO2}`);
+          return {
+            vitalsId: entry.vitalsId || 0,
+            skinTemp: entry.skinTemp || 98,
+            pulse: entry.pulse || 70,
+            spO2: entry.spO2 || 98,
+            timestamp: entry.timestamp,
+            date: dateStr,
+          };
+        });
 
         console.log("📊 LineChart: Formatted data:", formatted);
         setVitalsData(formatted);
