@@ -79,7 +79,7 @@ export default function Settings({ isFirstTime = false, onProfileSaved }: Settin
 
       if (isFirstTime) {
         setTimeout(()=>{
-          navigate("/dashboard", { replace: true })
+          navigate("/dashboard", { replace: true, state: { isFirstTime: false} })
         }, 500);
       }
     } catch (err) {
