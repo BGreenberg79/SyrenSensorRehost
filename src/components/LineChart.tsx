@@ -27,6 +27,8 @@ type ChartDataPoint = VitalsSnapshot & {
 export default function VitalsChart() {
   const { user } = useAuthenticator();
   const [vitalsData, setVitalsData] = useState<ChartDataPoint[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function getAuthToken() {
     const session = await fetchAuthSession();
@@ -39,37 +41,63 @@ export default function VitalsChart() {
 
     async function fetchVitals() {
       try {
-        const idToken = await getAuthToken();
-        const userID = user.signInDetails?.loginId ?? "";
+        setLoading(true);
+        setError(null);
 
-        const res = await fetch(`https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals?email=${encodeURIComponent(userID)}`, {
+        const idToken = await getAuthToken();
+        const userEmail = user.signInDetails?.loginId ?? "";
+
+        const url = `https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals?email=${encodeURIComponent(userEmail)}`;
+        
+        console.log("📊 LineChart: Fetching from", url);
+
+        const res = await fetch(url, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${idToken}`,
           },
         });
 
+        console.log("📊 LineChart: Response status", res.status);
+
         if (!res.ok) {
           const errorText = await res.text();
+          console.error("📊 LineChart: Error response", errorText);
           throw new Error(`HTTP ${res.status}: ${errorText}`);
         }
 
         const responseData = await res.json();
-        
-        // Handle Lambda response structure
+        console.log("📊 LineChart: Raw response data:", responseData);
+        console.log("📊 LineChart: Response type:", typeof responseData);
+        console.log("📊 LineChart: Is Array?", Array.isArray(responseData));
+
+        // Handle different response structures
         let vitalsArray: VitalsSnapshot[];
-        
+
         if (Array.isArray(responseData)) {
-          // Direct array response
+          console.log("📊 LineChart: Detected direct array response");
           vitalsArray = responseData;
         } else if (responseData.body) {
-          // Lambda response with body property (might be stringified)
+          console.log("📊 LineChart: Detected body property");
           vitalsArray = typeof responseData.body === 'string' 
             ? JSON.parse(responseData.body) 
             : responseData.body;
+        } else if (responseData.Items) {
+          console.log("📊 LineChart: Detected DynamoDB Items response");
+          vitalsArray = responseData.Items;
         } else {
-          console.error('Unexpected API response structure:', responseData);
-          vitalsArray = [];
+          console.error("📊 LineChart: Unknown response structure:", responseData);
+          setError("Unknown API response format");
+          return;
+        }
+
+        console.log("📊 LineChart: Parsed vitals array:", vitalsArray);
+        console.log("📊 LineChart: Array length:", vitalsArray.length);
+
+        if (!Array.isArray(vitalsArray)) {
+          console.error("📊 LineChart: Final vitals is not an array");
+          setError("Vitals data is not an array");
+          return;
         }
 
         // Sort by timestamp (ascending)
@@ -77,18 +105,34 @@ export default function VitalsChart() {
 
         // Format for chart display
         const formatted: ChartDataPoint[] = sorted.map((entry) => ({
-          ...entry,
+          vitalsId: entry.vitalsId || 0,
+          skinTemp: entry.skinTemp || 98,
+          pulse: entry.pulse || 70,
+          spO2: entry.spO2 || 98,
+          timestamp: entry.timestamp,
           date: new Date(entry.timestamp).toLocaleDateString(),
         }));
 
+        console.log("📊 LineChart: Formatted data:", formatted);
         setVitalsData(formatted);
       } catch (err) {
-        console.error('Error fetching 30-day vitals:', err);
+        console.error('📊 LineChart: Error fetching vitals:', err);
+        setError(err instanceof Error ? err.message : 'Unknown error');
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchVitals();
   }, [user]);
+
+  if (loading) return <div className="w-full h-[400px] flex items-center justify-center text-white">Loading chart...</div>;
+  
+  if (error) return <div className="w-full h-[400px] flex items-center justify-center text-red-500">Error: {error}</div>;
+
+  if (vitalsData.length === 0) {
+    return <div className="w-full h-[400px] flex items-center justify-center text-white">No vitals data available</div>;
+  }
 
   return (
     <div className="w-full h-[400px]">
