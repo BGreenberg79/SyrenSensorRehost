@@ -7,9 +7,10 @@ import syrenLogo from '../assets/syrensensor2.png'
 
 interface SettingsProps {
   isFirstTime?: boolean;
+  onProfileSaved?: () => Promise<void>;
 }
 
-export default function Settings({ isFirstTime = false }: SettingsProps) {
+export default function Settings({ isFirstTime = false, onProfileSaved }: SettingsProps) {
   const { settingsState, updateUser, updateEmergencyContact } = useSettingsContext();
   const { user } = useAuthenticator();
   const navigate = useNavigate();
@@ -69,8 +70,17 @@ export default function Settings({ isFirstTime = false }: SettingsProps) {
       }
 
       alert("Profile saved successfully!");
+      setIsSaving(false);
+
+      // Generate vitals if first time user
+      if (isFirstTime && onProfileSaved) {
+        await onProfileSaved();
+      }
+
       if (isFirstTime) {
-        navigate("/dashboard");
+        setTimeout(()=>{
+          navigate("/dashboard", { replace: true })
+        }, 500);
       }
     } catch (err) {
       console.error("Error saving profile:", err);

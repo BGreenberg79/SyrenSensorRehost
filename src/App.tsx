@@ -79,6 +79,49 @@ function App() {
   const [isFirstTime, setIsFirstTime] = useState(false);
   const { setSettingsState } = useSettingsContext();
 
+  const generateVitals = async(email: string, idToken: string) => {
+    try{
+      console.log("Generating random vitals for:", email);
+      console.log("Generating random vitals for:", email);
+      const res = await fetch(
+        "https://clgjdzows9.execute-api.us-east-1.amazonaws.com/dev/vitals",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            email,
+            numDataPoints: 30,
+          }),
+        }
+      );
+      if (res.ok) {
+        console.log("✓ Vitals generated successfully");
+      } else {
+        console.error("Failed to generate vitals:", res.status);
+      }
+    } catch (err) {
+      console.error("Error generating vitals:", err);
+    }
+  } 
+
+    // Function to trigger vitals generation after profile save
+  const handleProfileSaved = async () => {
+    const email = user?.signInDetails?.loginId;
+    if (!email) return;
+
+    try {
+      const session = await fetchAuthSession();
+      const idToken = session.tokens?.idToken?.toString();
+      if (idToken) {
+        await generateVitals(email, idToken);
+      }
+    } catch (err) {
+      console.error("Error in handleProfileSaved:", err);
+    }
+  };
   useEffect(() => {
     const checkProfileAndLoad = async () => {
       const email = user?.signInDetails?.loginId;
@@ -184,7 +227,7 @@ function App() {
       <main>
         <div className="flex flex-col min-h-screen">
           <div className="flex-grow">
-            <Settings isFirstTime={true} />
+            <Settings isFirstTime={true} onProfileSaved={handleProfileSaved} />
           </div>
           <NavBar />
           <EMSModal />
